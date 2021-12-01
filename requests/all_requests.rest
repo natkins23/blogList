@@ -12,7 +12,7 @@ POST http://localhost:3003/api/blogs  HTTP/1.1
 Content-Type:application/json
 
 {
-    "title": "Nathan's Notions",
+    "title": "Nathan's Notionds",
     "author": "Nathan Watkins",
     "url": "nathansnotions.com",
     "likes": 69
