@@ -5,7 +5,7 @@ const cors = require('cors')
 const mongoose = require('mongoose')
 
 const mongoUrl = 'mongodb+srv://fullstack:fullstack@cluster0.nqtht.mongodb.net/blogList?retryWrites=true&w=majority'
-mongoose.connect(mongoUrl).then(console.log('connected to mongodb'))
+mongoose.connect(mongoUrl)
 
 const blogSchema = new mongoose.Schema({
     title: String,
