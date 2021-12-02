@@ -6,7 +6,6 @@
     "scripts": {
         "start": "node index.js",
         "dev": "nodemon index.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
         "build:ui": "rm -rf build && cd ../phonebook/ && npm run build --prod && cp -r build ../phonebook_backend",
         "deploy": "git push heroku main",
         "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push && npm run deploy",
@@ -16,7 +15,8 @@
         "qdeleteB": "node shell/delete.js",
         "qPB": "node shell/push-then-branch.js",
         "lint": "eslint .",
-        "lint:fix": "eslint . --fix"
+        "lint:fix": "eslint . --fix",
+        "test": "jest --verbose"
     },
     "author": "Nathan Watkins",
     "license": "ISC",
@@ -36,7 +36,11 @@
         "eslint-plugin-prettier": "^4.0.0",
         "eslint-plugin-react": "^7.27.1",
         "eslint-plugin-react-hooks": "^4.3.0",
+        "jest": "^27.4.3",
         "nodemon": "^2.0.14",
         "prettier": "2.4.1"
+    },
+    "jest": {
+        "testEnvironment": "node"
     }
 }
