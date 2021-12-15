@@ -111,3 +111,20 @@ describe('Most Published Author', () => {
         })
     })
 })
+
+describe('Most Liked Author', () => {
+    test('the most liked author', () => {
+        const result = listHelper.mostLikedAuthor(biggerList)
+        expect(result).toEqual({
+            author: 'Edsger W. Dijkstra',
+            likes: 17,
+        })
+    })
+    test('their most liked author', () => {
+        const result = listHelper.theirMostLikedAuthor(biggerList)
+        expect(result).toEqual({
+            author: 'Edsger W. Dijkstra',
+            likes: 17,
+        })
+    })
+})

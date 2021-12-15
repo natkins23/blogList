@@ -79,6 +79,30 @@ const otherMostBlogs = blogList => {
     return blockCountByAuthor[0]
 }
 
+const mostLikedAuthor = blogList => {
+    if (blogList.length === 0) {
+        return null
+    }
+    const blogsByAuthor = _.toPairs(_.groupBy(blogList, b => b.likes))
+    console.log(blogsByAuthor)
+}
+
+const theirMostLikedAuthor = blogList => {
+    if (blogList.length === 0) {
+        return null
+    }
+
+    const blogsByAuthor = _.toPairs(_.groupBy(blogList, b => b.author))
+    const likeCountByAuthor = blogsByAuthor
+        .map(([author, blogs]) => ({
+            author,
+            likes: blogs.reduce((s, b) => s + b.likes, 0),
+        }))
+        .sort((a1, a2) => a2.likes - a1.likes)
+
+    return likeCountByAuthor[0]
+}
+
 module.exports = {
     dummy,
     totalLikes,
@@ -86,4 +110,6 @@ module.exports = {
     mostBlogs,
     otherMostBlogs,
     favoriteBlog,
+    mostLikedAuthor,
+    theirMostLikedAuthor,
 }
