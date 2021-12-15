@@ -83,24 +83,15 @@ const mostLikedAuthor = blogList => {
     if (blogList.length === 0) {
         return null
     }
-    const blogsByAuthor = _.toPairs(_.groupBy(blogList, b => b.likes))
-    console.log(blogsByAuthor)
-}
-
-const theirMostLikedAuthor = blogList => {
-    if (blogList.length === 0) {
-        return null
-    }
-
     const blogsByAuthor = _.toPairs(_.groupBy(blogList, b => b.author))
     const likeCountByAuthor = blogsByAuthor
-        .map(([author, blogs]) => ({
+        .map(([author, likes]) => ({
             author,
-            likes: blogs.reduce((s, b) => s + b.likes, 0),
+            likes: likes.reduce((total, current) => total + current.likes, 0),
         }))
-        .sort((a1, a2) => a2.likes - a1.likes)
+        .sort((a, b) => a.likes - b.likes)
 
-    return likeCountByAuthor[0]
+    return _.last(likeCountByAuthor)
 }
 
 module.exports = {
@@ -111,5 +102,4 @@ module.exports = {
     otherMostBlogs,
     favoriteBlog,
     mostLikedAuthor,
-    theirMostLikedAuthor,
 }
