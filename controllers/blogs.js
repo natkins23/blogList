@@ -3,17 +3,17 @@ const Blog = require('../models/blog')
 
 blogRouter.get('/', (req, res, next) => {
     Blog.find({})
-        .then(persons => {
-            res.json(persons.map(person => person.toJSON()))
+        .then(blogs => {
+            res.json(blogs.map(blog => blog.toJSON()))
         })
         .catch(error => next(error))
 })
 
 blogRouter.get('/:id', (req, res, next) => {
     Blog.findById(req.params.id)
-        .then(person => {
-            if (person) {
-                res.json(person)
+        .then(blog => {
+            if (blog) {
+                res.json(blog)
             } else {
                 res.status(404).end()
             }
@@ -37,8 +37,8 @@ blogRouter.post('/', (req, res, next) => {
     }
     const blog = new Blog(req.body)
     blog.save()
-        .then(savedPerson => {
-            res.json(savedPerson)
+        .then(savedBlog => {
+            res.json(savedBlog)
         })
         .catch(error => next(error))
 })
@@ -52,16 +52,16 @@ blogRouter.delete('/:id', (req, res, next) => {
 })
 
 blogRouter.put('/:id', (req, res, next) => {
-    const { name, number } = req.body
-    const person = { name, number }
+    const { title, author, url, likes } = req.body
+    const blog = { title, author, url, likes }
     const opts = {
         new: true,
         runValidators: true,
         context: 'query',
     }
-    Blog.findByIdAndUpdate(req.params.id, person, opts)
-        .then(newPerson => {
-            res.json(newPerson)
+    Blog.findByIdAndUpdate(req.params.id, blog, opts)
+        .then(newBlog => {
+            res.json(newBlog)
         })
         .catch(error => next(error))
 })
