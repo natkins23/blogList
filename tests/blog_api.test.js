@@ -26,27 +26,6 @@ test('blogs are returned as json', async () => {
         .expect(200)
         .expect('Content-Type', /application\/json/)
 })
-test('a valid blog can be added', async () => {
-    const newBlog = {
-        title: 'async/await simplifies making async calls',
-        author: 'test',
-        url: 'test.org',
-        likes: 69,
-    }
-
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-
-    const response = await api.get('/api/blogs')
-
-    const contents = response.body.map(r => r.title)
-
-    expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
-    expect(contents).toContain('async/await simplifies making async calls')
-})
 
 test('blog without content is not added', async () => {
     const newBlog = {
@@ -64,6 +43,28 @@ test('blog uses id instead of _id', async () => {
     const response = await api.get('/api/blogs')
     expect(response.body.every(blog => blog.id)).toBeTruthy()
     expect(response.body.some(blog => blog._id)).toBeFalsy()
+})
+
+test('a valid blog can be added', async () => {
+    const newBlog = {
+        title: 'async/await simplifies making async calls',
+        author: 'test',
+        url: 'test.org',
+        likes: 69,
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+
+    const contents = response.body.map(r => r.title)
+
+    expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
+    expect(contents).toContain('async/await simplifies making async calls')
 })
 
 afterAll(() => {

@@ -18,7 +18,7 @@ blogRouter.get('/:id', (req, res, next) => {
         .catch(error => next(error))
 })
 
-blogRouter.post('/', (req, res, next) => {
+blogRouter.post('/', async (req, res) => {
     const { title, author, url, likes } = req.body
     if (title === undefined) {
         return res.status(400).json({ error: 'title missing' })
@@ -33,11 +33,10 @@ blogRouter.post('/', (req, res, next) => {
         return res.status(400).json({ error: 'likes missing' })
     }
     const blog = new Blog(req.body)
-    blog.save()
-        .then(savedBlog => {
-            res.json(savedBlog)
-        })
-        .catch(error => next(error))
+
+    const savedBlog = await blog.save()
+
+    res.status(201).json(savedBlog)
 })
 
 blogRouter.delete('/:id', (req, res, next) => {
