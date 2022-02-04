@@ -87,6 +87,18 @@ test('blog likes default value is 0', async () => {
     expect(addedBlog.likes).toBe(0)
 })
 
+test('operation fails with proper error if url and title are missing', async () => {
+    const newBlog = {
+        author: 'Rick Hanlon',
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })

@@ -20,14 +20,11 @@ blogRouter.get('/:id', (req, res, next) => {
 
 blogRouter.post('/', async (req, res) => {
     const blog = req.body
-    if (blog.title === undefined) {
-        return res.status(400).json({ error: 'title missing' })
+    if (!blog.title || !blog.url) {
+        return res.status(400).json({ error: 'missing title or url' })
     }
-    if (blog.author === undefined) {
-        return res.status(400).json({ error: 'author missing' })
-    }
-    if (blog.url === undefined) {
-        return res.status(400).json({ error: 'url missing' })
+    if (!blog.author) {
+        return res.status(400).json({ error: 'missing author' })
     }
     if (blog.likes === undefined) {
         blog.likes = 0
