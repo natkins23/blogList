@@ -9,10 +9,7 @@ const Blog = require('../models/blog')
 
 beforeEach(async () => {
     await Blog.deleteMany({})
-    let blogObject = new Blog(helper.initialBlogs[0])
-    await blogObject.save()
-    blogObject = new Blog(helper.initialBlogs[1])
-    await blogObject.save()
+    await Blog.insertMany(helper.initialBlogs)
 })
 
 describe('testing initial notes', () => {
@@ -127,6 +124,16 @@ describe('Blogs structure', () => {
             .send(newBlog)
             .expect(400)
             .expect('Content-Type', /application\/json/)
+    })
+})
+
+describe('deletion of a note', () => {
+    test('succeeds with status code 204 if id is valid', async () => {
+        const blogListAtStart = await helper.blogsInDb()
+        const firstBlogId = blogListAtStart[0].id
+        await api.delete(`/api/blogs/${firstBlogId}`).expect(204)
+        const blogListAfterDeletion = await helper.blogsInDb()
+        expect(blogListAfterDeletion.length).toBe(helper.initialBlogs.length - 1)
     })
 })
 
