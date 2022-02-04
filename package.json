@@ -16,7 +16,7 @@
         "qPB": "node shell/push-then-branch.js",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
-        "test": "cross-env NODE_ENV=test jest --verbose --runInBand ---detectOpenHandles"
+        "test": "cross-env NODE_ENV=test jest --verbose --runInBand"
     },
     "author": "Nathan Watkins",
     "license": "ISC",

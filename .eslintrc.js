@@ -10,7 +10,7 @@ module.exports = {
         ecmaVersion: 12,
     },
     rules: {
-        'prettier/prettier': 'error',
+        'prettier/prettier': ['error', { endOfLine: 'auto' }],
         'no-console': 'off',
         'no-use-before-define': 'off',
         'no-underscore-dangle': 'off',
