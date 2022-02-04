@@ -67,6 +67,26 @@ test('a valid blog can be added', async () => {
     expect(contents).toContain('async/await simplifies making async calls')
 })
 
+test('blog likes default value is 0', async () => {
+    const unlikedBlog = {
+        title: 'no one likes me',
+        author: 'amumu',
+        url: 'suicide.org',
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(unlikedBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const res = await api.get('/api/blogs')
+
+    expect(res.body).toHaveLength(helper.initialBlogs.length + 1)
+    const addedBlog = res.body.find(b => b.title === unlikedBlog.title)
+    expect(addedBlog.likes).toBe(0)
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })

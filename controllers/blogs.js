@@ -19,22 +19,22 @@ blogRouter.get('/:id', (req, res, next) => {
 })
 
 blogRouter.post('/', async (req, res) => {
-    const { title, author, url, likes } = req.body
-    if (title === undefined) {
+    const blog = req.body
+    if (blog.title === undefined) {
         return res.status(400).json({ error: 'title missing' })
     }
-    if (author === undefined) {
+    if (blog.author === undefined) {
         return res.status(400).json({ error: 'author missing' })
     }
-    if (url === undefined) {
+    if (blog.url === undefined) {
         return res.status(400).json({ error: 'url missing' })
     }
-    if (likes === undefined) {
-        return res.status(400).json({ error: 'likes missing' })
+    if (blog.likes === undefined) {
+        blog.likes = 0
     }
-    const blog = new Blog(req.body)
+    const newBlog = new Blog(blog)
 
-    const savedBlog = await blog.save()
+    const savedBlog = await newBlog.save()
 
     res.status(201).json(savedBlog)
 })
