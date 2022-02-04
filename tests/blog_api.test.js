@@ -60,6 +60,12 @@ test('blog without content is not added', async () => {
     expect(response.body).toHaveLength(helper.initialBlogs.length)
 })
 
+test('blog uses id instead of _id', async () => {
+    const response = await api.get('/api/blogs')
+    expect(response.body.every(blog => blog.id)).toBeTruthy()
+    expect(response.body.some(blog => blog._id)).toBeFalsy()
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })
