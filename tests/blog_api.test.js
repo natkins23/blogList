@@ -127,6 +127,16 @@ describe('Blogs structure', () => {
     })
 })
 
+describe('deletion of a note', () => {
+    test('succeeds with status code 204 if id is valid', async () => {
+        const blogListAtStart = await helper.blogsInDb()
+        const firstBlogId = blogListAtStart[0].id
+        await api.delete(`/api/blogs/${firstBlogId}`).expect(204)
+        const blogListAfterDeletion = await helper.blogsInDb()
+        expect(blogListAfterDeletion.length).toBe(helper.initialBlogs.length - 1)
+    })
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })
