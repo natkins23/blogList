@@ -137,6 +137,17 @@ describe('deletion of a note', () => {
     })
 })
 
+describe('edit blog post', () => {
+    test('edit likes of a single post', async () => {
+        const blogs = await helper.blogsInDb()
+        const nancysPost = blogs.find(b => b.author === 'Nancy Pelosi')
+        nancysPost.likes -= 1
+        await api.put(`/api/blogs/${nancysPost.id}`).send(nancysPost).expect(200)
+        const updatedBlogs = await helper.blogsInDb()
+        expect(updatedBlogs[1].likes).toBe(0)
+    })
+})
+
 afterAll(() => {
     mongoose.connection.close()
 })
