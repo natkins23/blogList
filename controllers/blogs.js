@@ -1,28 +1,20 @@
 const blogRouter = require('express').Router() //
 const Blog = require('../models/blog')
 
-blogRouter.get('/', async (req, res, next) => {
+blogRouter.get('/', async (req, res) => {
     const blogs = await Blog.find({})
-    try {
-        res.json(blogs.map(blog => blog.toJSON()))
-    } catch (exception) {
-        next(exception)
-    }
+    res.json(blogs.map(blog => blog.toJSON()))
 })
-blogRouter.get('/:id', async (req, res, next) => {
-    try {
-        const specificBlog = await Blog.findById(req.params.id)
-        if (specificBlog) {
-            res.json(specificBlog.toJSON())
-        } else {
-            res.status(404).end()
-        }
-    } catch (exception) {
-        next(exception)
+blogRouter.get('/:id', async (req, res) => {
+    const specificBlog = await Blog.findById(req.params.id)
+    if (specificBlog) {
+        res.json(specificBlog.toJSON())
+    } else {
+        res.status(404).end()
     }
 })
 
-blogRouter.post('/', async (req, res, next) => {
+blogRouter.post('/', async (req, res) => {
     const blog = req.body
     if (!blog.title || !blog.url) {
         return res.status(400).json({ error: 'missing title or url' })
@@ -34,21 +26,13 @@ blogRouter.post('/', async (req, res, next) => {
         blog.likes = 0
     }
     const newBlog = new Blog(blog)
-    try {
-        const savedBlog = await newBlog.save()
-        res.status(201).json(savedBlog)
-    } catch (exception) {
-        next(exception)
-    }
+    const savedBlog = await newBlog.save()
+    res.status(201).json(savedBlog)
 })
 
-blogRouter.delete('/:id', async (req, res, next) => {
-    try {
-        await Blog.findByIdAndRemove(req.params.id)
-        res.status(204).end()
-    } catch (exception) {
-        next(exception)
-    }
+blogRouter.delete('/:id', async (req, res) => {
+    await Blog.findByIdAndRemove(req.params.id)
+    res.status(204).end()
 })
 
 blogRouter.put('/:id', (req, res, next) => {
