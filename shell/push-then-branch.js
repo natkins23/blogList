@@ -42,7 +42,7 @@ function pushcb(err) {
     console.log(`Changes pushed`)
 }
 
-// createing new branch
+// creating new branch
 const newBranch = exercise
 
 setTimeout(() => exec(`git branch "${newBranch}"`, makeBranch), 3000)
