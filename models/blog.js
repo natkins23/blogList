@@ -1,5 +1,3 @@
-//  need to import the enviornment variables from config.js
-
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
