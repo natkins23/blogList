@@ -152,7 +152,7 @@ describe('edit blog post', () => {
     })
 })
 
-describe('when there is initially one user in db', () => {
+describe('user tests', () => {
     beforeEach(async () => {
         await User.deleteMany({})
 
@@ -162,30 +162,31 @@ describe('when there is initially one user in db', () => {
         await user.save()
     })
 
-    // test('creation succeeds with a fresh username', async () => {
-    //     const usersAtStart = await helper.usersInDb()
+    test('create new user', async () => {
+        const usersAtStart = await helper.usersInDb()
 
-    //     const newUser = {
-    //         username: 'mluukkai',
-    //         name: 'Matti Luukkainen',
-    //         password: 'salainen',
-    //     }
+        const newUser = {
+            username: 'mluukkai',
+            name: 'Matti Luukkainen',
+            password: 'salainen',
+        }
 
-    //     await api
-    //         .post('/api/users')
-    //         .send(newUser)
-    //         .expect(200)
-    //         .expect('Content-Type', /application\/json/)
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
 
-    //     const usersAtEnd = await helper.usersInDb()
-    //     expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
-    //     const usernames = usersAtEnd.map(u => u.username)
-    //     expect(usernames).toContain(newUser.username)
-    // })
+        const usernames = usersAtEnd.map(u => u.username)
+        expect(usernames).toContain(newUser.username)
+    })
 
     test('get existing users', async () => {
         const users = await api.get('/api/users').expect('Content-Type', /application\/json/)
+        console.log(users.body)
         expect(users.body[0].name).toBe('admin')
     })
 })
