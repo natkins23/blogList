@@ -6,10 +6,16 @@ usersRouter.post('/', async (req, res) => {
     const { body } = req
 
     if (!body.username) {
-        return res.status(400).json({ error: 'missing username' })
+        return res.status(400).json({ error: 'invalid input: missing username' })
+    }
+    if (body.username.length < 3) {
+        return res.status(400).json({ error: 'invalid input: username is less than three characters' })
     }
     if (!body.name) {
-        return res.status(400).json({ error: 'missing  name' })
+        return res.status(400).json({ error: 'invalid input: missing name' })
+    }
+    if (body.password.length < 3) {
+        return res.status(400).json({ error: 'invalid input: password is less than three characters' })
     }
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)

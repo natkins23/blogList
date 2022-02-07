@@ -164,7 +164,6 @@ describe('user tests', () => {
 
     test('create new user', async () => {
         const usersAtStart = await helper.usersInDb()
-
         const newUser = {
             username: 'mluukkai',
             name: 'Matti Luukkainen',
@@ -186,7 +185,6 @@ describe('user tests', () => {
 
     test('get existing users', async () => {
         const users = await api.get('/api/users').expect('Content-Type', /application\/json/)
-        console.log(users.body)
         expect(users.body[0].name).toBe('admin')
     })
 
@@ -208,23 +206,77 @@ describe('user tests', () => {
             const usersAtEnd = await helper.usersInDb()
             expect(usersAtEnd).toHaveLength(usersAtStart.length)
         })
-    })
-    test('user with no name', async () => {
-        const usersAtStart = await helper.usersInDb()
+        test('user with no name', async () => {
+            const usersAtStart = await helper.usersInDb()
 
-        const newUser = {
-            username: 'mluukkai',
-            password: 'salainen',
-        }
+            const newUser = {
+                username: 'mluukkai',
+                password: 'salainen',
+            }
 
-        await api
-            .post('/api/users')
-            .send(newUser)
-            .expect(400)
-            .expect('Content-Type', /application\/json/)
+            await api
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .expect('Content-Type', /application\/json/)
 
-        const usersAtEnd = await helper.usersInDb()
-        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+            const usersAtEnd = await helper.usersInDb()
+            expect(usersAtEnd).toHaveLength(usersAtStart.length)
+        })
+        test('username is too short', async () => {
+            const usersAtStart = await helper.usersInDb()
+
+            const newUser = {
+                username: '12',
+                name: 'Matti Luukkainen',
+                password: 'salainen',
+            }
+
+            await api
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .expect('Content-Type', /application\/json/)
+
+            const usersAtEnd = await helper.usersInDb()
+            expect(usersAtEnd).toHaveLength(usersAtStart.length)
+        })
+        test('password is too short', async () => {
+            const usersAtStart = await helper.usersInDb()
+
+            const newUser = {
+                username: 'mluukkai',
+                name: 'Matti Luukkainen',
+                password: '12',
+            }
+
+            await api
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .expect('Content-Type', /application\/json/)
+
+            const usersAtEnd = await helper.usersInDb()
+            expect(usersAtEnd).toHaveLength(usersAtStart.length)
+        })
+        test('username is not unique', async () => {
+            const usersAtStart = await helper.usersInDb()
+
+            const newUser = {
+                username: 'root',
+                name: 'Matti Luukkainen',
+                password: 'salainen',
+            }
+
+            await api
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .expect('Content-Type', /application\/json/)
+
+            const usersAtEnd = await helper.usersInDb()
+            expect(usersAtEnd).toHaveLength(usersAtStart.length)
+        })
     })
 })
 
