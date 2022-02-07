@@ -5,6 +5,12 @@ const User = require('../models/user')
 usersRouter.post('/', async (req, res) => {
     const { body } = req
 
+    if (!body.username) {
+        return res.status(400).json({ error: 'missing username' })
+    }
+    if (!body.name) {
+        return res.status(400).json({ error: 'missing  name' })
+    }
     const saltRounds = 10
     const passwordHash = await bcrypt.hash(body.password, saltRounds)
     const user = new User({
@@ -14,7 +20,7 @@ usersRouter.post('/', async (req, res) => {
     })
     const savedUser = await user.save()
 
-    res.json(savedUser)
+    res.status(201).json(savedUser)
 })
 
 usersRouter.get('/', async (request, response) => {

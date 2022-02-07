@@ -174,7 +174,7 @@ describe('user tests', () => {
         await api
             .post('/api/users')
             .send(newUser)
-            .expect(200)
+            .expect(201)
             .expect('Content-Type', /application\/json/)
 
         const usersAtEnd = await helper.usersInDb()
@@ -188,6 +188,43 @@ describe('user tests', () => {
         const users = await api.get('/api/users').expect('Content-Type', /application\/json/)
         console.log(users.body)
         expect(users.body[0].name).toBe('admin')
+    })
+
+    describe('invalid user tests', () => {
+        test('user with no username', async () => {
+            const usersAtStart = await helper.usersInDb()
+
+            const newUser = {
+                name: 'Matti Luukkainen',
+                password: 'salainen',
+            }
+
+            await api
+                .post('/api/users')
+                .send(newUser)
+                .expect(400)
+                .expect('Content-Type', /application\/json/)
+
+            const usersAtEnd = await helper.usersInDb()
+            expect(usersAtEnd).toHaveLength(usersAtStart.length)
+        })
+    })
+    test('user with no name', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            username: 'mluukkai',
+            password: 'salainen',
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
     })
 })
 
