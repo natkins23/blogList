@@ -1,4 +1,21 @@
 
+
+### login
+GET http://localhost:3003/api/login
+
+###
+POST http://localhost:3003/api/login  HTTP/1.1
+Content-Type:application/json
+
+{
+    "username": "mluukkai",
+    "password": "salainen"
+}
+
+
+
+
+
 ### Blogs
 GET http://localhost:3003/api/blogs
 
@@ -7,9 +24,9 @@ POST http://localhost:3003/api/blogs  HTTP/1.1
 Content-Type:application/json
 
 {
-    "title": "Mattfi's Notions",
+    "title": "Matti's Notions",
     "author": "Nathan Watkins",
-    "url": "nathansnotions.com",
+    "url": "https://nathansnotions.com",
     "likes": 69
 }
 
