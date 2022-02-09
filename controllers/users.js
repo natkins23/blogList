@@ -2,37 +2,38 @@ const usersRouter = require('express').Router()
 const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
-usersRouter.post('/', async (req, res) => {
-    const { body } = req
+usersRouter.get('/', async (req, res) => {
+    const users = await User.find({}).populate('blogs', { title: 1, author: 1 })
 
-    if (!body.username) {
+    res.json(users)
+})
+
+usersRouter.post('/', async (req, res) => {
+    const { password, username, name, blogs } = req.body
+
+    if (!username) {
         return res.status(400).json({ error: 'invalid input: missing username' })
     }
-    if (body.username.length < 3) {
+    if (username.length < 3) {
         return res.status(400).json({ error: 'invalid input: username is less than three characters' })
     }
-    if (!body.name) {
+    if (!name) {
         return res.status(400).json({ error: 'invalid input: missing name' })
     }
-    if (body.password.length < 3) {
+    if (password.length < 3) {
         return res.status(400).json({ error: 'invalid input: password is less than three characters' })
     }
     const saltRounds = 10
-    const passwordHash = await bcrypt.hash(body.password, saltRounds)
+    const passwordHash = await bcrypt.hash(password, saltRounds)
     const user = new User({
-        username: body.username,
-        name: body.name,
+        username,
+        name,
         passwordHash,
+        blogs,
     })
     const savedUser = await user.save()
 
     res.status(201).json(savedUser)
-})
-
-usersRouter.get('/', async (request, response) => {
-    const users = await User.find({})
-
-    response.json(users.map(u => u.toJSON()))
 })
 
 module.exports = usersRouter
