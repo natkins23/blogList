@@ -1,5 +1,7 @@
-// const morgan = require('morgan')
+require('dotenv').config()
+const jwt = require('jsonwebtoken')
 const logger = require('./logger')
+const User = require('../models/user')
 
 const requestLogger = (request, response, next) => {
     logger.info('Method:', request.method)
@@ -25,12 +27,26 @@ const errorHandler = (error, req, res, next) => {
     next(error)
 }
 
-const tokenExtractor = (request, response, next) => {
-    const authorization = request.get('authorization')
+const tokenExtractor = (req, res, next) => {
+    const authorization = req.get('authorization')
     if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        request.token = authorization.substring(7)
+        req.token = authorization.substring(7)
     }
 
+    next()
+}
+
+const userExtractor = async (req, res, next) => {
+    console.log('is this being run')
+    const decidedToken = jwt.verify(req.token, process.env.SECRET)
+
+    if (!req.token || !decidedToken.id) {
+        return req.status(401).json({ error: 'token missing or invalid' })
+    }
+    const user = await User.findById(decidedToken.id)
+    if (user) {
+        req.user = user
+    }
     next()
 }
 
@@ -39,4 +55,5 @@ module.exports = {
     unknownEndpoint,
     errorHandler,
     tokenExtractor,
+    userExtractor,
 }

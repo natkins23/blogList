@@ -12,20 +12,16 @@ Content-Type:application/json
     "password": "salainen"
 }
 
-
-
-
-
 ### Blogs
 GET http://localhost:3003/api/blogs
 
 ###
 POST http://localhost:3003/api/blogs  HTTP/1.1
 Content-Type:application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI2MjA0MGMwYmMwMGE1ZDJmMWY2OGE5ZGYiLCJpYXQiOjE2NDQ0NTI0Nzl9.QXGOpxdJW8srKZm_44x6oJ2JHVnHidzQI-C7IQPV3tQ
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI2MjA0MGMwYmMwMGE1ZDJmMWY2OGE5ZGYiLCJpYXQiOjE2NDQ1MTgxMjJ9.bhiyBWYU0k0QlQD7YR2c9y7RqIqdFLA_I0gVMOw-i2c
 
 {
-    "title": "Mattid's Notions",
+    "title": "test's Notions",
     "author": "Nathan Watkins",
     "url": "https://nathansnotions.com",
     "likes": 69
