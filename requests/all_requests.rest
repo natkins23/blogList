@@ -25,7 +25,7 @@ Content-Type:application/json
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI2MjA0MGMwYmMwMGE1ZDJmMWY2OGE5ZGYiLCJpYXQiOjE2NDQ0NTI0Nzl9.QXGOpxdJW8srKZm_44x6oJ2JHVnHidzQI-C7IQPV3tQ
 
 {
-    "title": "Matti's Notions",
+    "title": "Mattid's Notions",
     "author": "Nathan Watkins",
     "url": "https://nathansnotions.com",
     "likes": 69
