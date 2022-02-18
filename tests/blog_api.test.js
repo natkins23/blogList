@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 const app = require('../app')
 const helper = require('./test_helper')
 
@@ -9,14 +11,45 @@ const api = supertest(app)
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+// global variables
+let token
+let noBlogsToken
+
 beforeEach(async () => {
     await Blog.deleteMany({})
-    const blogObject = helper.initialBlogs.map(b => new Blog(b))
-    const promiseArray = blogObject.map(b => b.save())
-    await Promise.all(promiseArray)
+    await User.deleteMany({})
+
+    const rootUser = await new User({
+        username: 'root',
+        passowrd: 'secret',
+    }).save()
+
+    const userWithNoBlogs = await new User({
+        username: 'notRoot',
+        passowrd: 'aLittleLessSecret',
+    }).save()
+
+    const userForToken = { username: rootUser.username, id: rootUser.id }
+    token = jwt.sign(userForToken, process.env.SECRET)
+
+    const userWithNoBlogsToken = {
+        username: userWithNoBlogs.username,
+        id: userWithNoBlogs.id,
+    }
+    noBlogsToken = jwt.sign(userWithNoBlogsToken, process.env.SECRET)
+
+    await Promise.all(
+        helper.initialBlogs.map(blog => {
+            blog.user = rootUser.id
+            return new Blog(blog).save()
+        })
+    )
+    const blogs = await helper.blogsInDb()
+    blogs.map(blog => rootUser.blogs.push(blog.id))
+    rootUser.save()
 })
 
-describe('testing initial notes', () => {
+describe('testing initial blogs', () => {
     test('all blogs are returned', async () => {
         const response = await api.get('/api/blogs')
         expect(response.body).toHaveLength(helper.initialBlogs.length)
@@ -36,7 +69,7 @@ describe('testing initial notes', () => {
         expect(titles).toContain('How to become a front-end developer')
     })
 })
-describe('viewing a specific note', () => {
+describe('viewing a specific blog', () => {
     test('succeeds with a valid id', async () => {
         const blogs = await helper.blogsInDb()
 
@@ -44,8 +77,7 @@ describe('viewing a specific note', () => {
             .get(`/api/blogs/${blogs[0].id}`)
             .expect(200)
             .expect('Content-Type', /application\/json/)
-
-        expect(response.body).toEqual(blogs[0])
+        expect(response.body.id).toBe(blogs[0].id)
     })
 
     test('fails with statuscode 404 if note does not exist', async () => {
@@ -61,7 +93,7 @@ describe('addition of new Blogs', () => {
             likes: 1337,
         }
 
-        await api.post('/api/blogs').send(newBlog).expect(400)
+        await api.post('/api/blogs').send(newBlog).set('Authorization', `bearer ${token}`).expect(400)
 
         const response = await api.get('/api/blogs')
 
@@ -79,6 +111,7 @@ describe('addition of new Blogs', () => {
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `bearer ${token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
@@ -108,6 +141,7 @@ describe('Blogs structure', () => {
         await api
             .post('/api/blogs')
             .send(unlikedBlog)
+            .set('Authorization', `bearer ${token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
@@ -126,42 +160,70 @@ describe('Blogs structure', () => {
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `bearer ${token}`)
             .expect(400)
             .expect('Content-Type', /application\/json/)
     })
 })
 
-describe('deletion of a note', () => {
+describe('deletion of a blog', () => {
     test('succeeds with status code 204 if id is valid', async () => {
         const blogListAtStart = await helper.blogsInDb()
         const firstBlogId = blogListAtStart[0].id
-        await api.delete(`/api/blogs/${firstBlogId}`).expect(204)
+        await api.delete(`/api/blogs/${firstBlogId}`).set('Authorization', `bearer ${token}`).expect(204)
         const blogListAfterDeletion = await helper.blogsInDb()
         expect(blogListAfterDeletion.length).toBe(helper.initialBlogs.length - 1)
+    })
+    test('cannot be deleted if the blog was not created by the same user', async () => {
+        const blogsAtStart = await helper.blogsInDb()
+        const blogToDelete = blogsAtStart[0]
+        await api.delete(`/api/blogs/${blogToDelete.id}`).set('Authorization', `bearer ${noBlogsToken}`).expect(401)
     })
 })
 
 describe('edit blog post', () => {
-    test('edit likes of a single post', async () => {
+    test('user edits their own posts likes', async () => {
         const blogs = await helper.blogsInDb()
-        const nancysPost = blogs.find(b => b.author === 'Nancy Pelosi')
-        nancysPost.likes -= 1
-        await api.put(`/api/blogs/${nancysPost.id}`).send(nancysPost).expect(200)
+
+        const postToChange = blogs.find(b => b.author === 'Nancy Pelosi')
+        postToChange.likes -= 1
+
+        const postToChangeId = postToChange.id
+
+        await api
+            .put(`/api/blogs/${postToChangeId}`)
+            .send(postToChange)
+            .set('Authorization', `bearer ${token}`)
+            .expect(200)
         const updatedBlogs = await helper.blogsInDb()
-        expect(updatedBlogs[1].likes).toBe(0)
+
+        const postAfterChange = updatedBlogs.find(b => b.id === postToChangeId)
+
+        expect(postAfterChange.likes).toBe(0)
+    })
+    test('user tries to edit another creators post', async () => {
+        const blogs = await helper.blogsInDb()
+
+        const postToChange = blogs.find(b => b.author === 'Nancy Pelosi')
+        postToChange.likes -= 1
+
+        const postToChangeId = postToChange.id
+
+        const result = await api
+            .put(`/api/blogs/${postToChangeId.id}`)
+            .send(postToChange)
+            .set('Authorization', `bearer ${noBlogsToken}`)
+            .expect(401)
+        const updatedBlogs = await helper.blogsInDb()
+
+        const postAfterChange = updatedBlogs.find(b => b.id === postToChangeId)
+        expect(postAfterChange.likes).toBe(1)
+
+        expect(result.body.error).toContain('only the creator can edit a blog')
     })
 })
 
 describe('user tests', () => {
-    beforeEach(async () => {
-        await User.deleteMany({})
-
-        const passwordHash = await bcrypt.hash('sekret', 10)
-        const user = new User({ username: 'root', name: 'admin', passwordHash })
-
-        await user.save()
-    })
-
     test('create new user', async () => {
         const usersAtStart = await helper.usersInDb()
         const newUser = {
@@ -185,7 +247,7 @@ describe('user tests', () => {
 
     test('get existing users', async () => {
         const users = await api.get('/api/users').expect('Content-Type', /application\/json/)
-        expect(users.body[0].name).toBe('admin')
+        expect(users.body[0].username).toBe('root')
     })
 
     describe('invalid user tests', () => {

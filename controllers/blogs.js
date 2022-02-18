@@ -35,13 +35,8 @@ blogRouter.post('/', userExtractor, async (req, res) => {
     if (blog.likes === undefined) {
         blog.likes = 0
     }
-    // test purposes
-    if (!blog.user) {
-        return res.status(400).json({ error: 'no users exist' })
-    }
 
     const savedBlog = await blog.save()
-    console.log(savedBlog)
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
     res.status(201).json(savedBlog)
@@ -58,16 +53,17 @@ blogRouter.delete('/:id', userExtractor, async (req, res) => {
     await user.save()
     res.status(204).end()
 })
-blogRouter.put('/:id', async (req, res) => {
-    const { title, author, url, likes } = req.body
-    const blog = { title, author, url, likes }
+blogRouter.put('/:id', userExtractor, async (req, res) => {
+    if (req.body.user.toString() !== req.user.id.toString()) {
+        return res.status(401).json({ error: 'only the creator can edit a blog' })
+    }
     const opts = {
         new: true,
         runValidators: true,
         context: 'query',
     }
-    await Blog.findByIdAndUpdate(req.params.id, blog, opts)
-    res.json(blog)
+    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, opts)
+    res.json(updatedBlog)
 })
 
 module.exports = blogRouter
